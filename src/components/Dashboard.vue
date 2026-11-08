@@ -4,12 +4,12 @@
     <!-- Header Section -->
     <header class="mb-10 text-center md:text-left">
       <div class="inline-block px-4 py-1.5 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold tracking-wide mb-3 shadow-inner">
-        VIRTUAL CITY
+        VIRTUAL HOME & CITY
       </div>
       <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight drop-shadow-sm">
-        Smart City <span class="text-indigo-600">IoT Hub</span>
+        Smart Home & City <span class="text-indigo-600">IoT Hub</span>
       </h1>
-      <p class="text-slate-500 mt-3 text-lg">Monitoring & Control Center (Powered by Supabase)</p>
+      <p class="text-slate-500 mt-3 text-lg">Monitoring & Control Center</p>
     </header>
 
     <!-- Loading State -->
