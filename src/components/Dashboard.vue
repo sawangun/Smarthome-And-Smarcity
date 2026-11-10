@@ -10,7 +10,7 @@
           <div
             class="mb-2 text-xs font-black tracking-[.2em] text-indigo-400"
           >
-            IoT - By Sawangun
+            IOT - BY SAWANGUN
           </div>
 
           <h1 class="text-3xl font-black">
