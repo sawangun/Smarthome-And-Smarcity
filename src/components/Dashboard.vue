@@ -10,11 +10,11 @@
           <div
             class="mb-2 text-xs font-black tracking-[.2em] text-indigo-400"
           >
-            SMART CITY CONTROL
+            IoT - By Sawangun
           </div>
 
           <h1 class="text-3xl font-black">
-            Smart Home
+            Smart Home & City
             <span class="text-indigo-400">Dashboard</span>
           </h1>
 
