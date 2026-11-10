@@ -1,164 +1,168 @@
 <template>
-  <div class="min-h-screen bg-slate-100 p-6 md:p-10 font-sans text-slate-800 selection:bg-indigo-200">
-    
-    <!-- Header Section -->
-    <header class="mb-10 text-center md:text-left">
-      <div class="inline-block px-4 py-1.5 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold tracking-wide mb-3 shadow-inner">
-        VIRTUAL HOME & CITY
+  <div class="min-h-screen bg-slate-950 text-slate-100">
+    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+
+      <!-- Header -->
+      <header class="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
+            <span class="h-2 w-2 animate-pulse rounded-full bg-emerald-400"></span>
+            SMART CITY • LIVE
+          </div>
+          <h1 class="text-3xl font-black tracking-tight sm:text-4xl">
+            Smart Home <span class="text-indigo-400">&amp; City</span>
+          </h1>
+          <p class="mt-2 text-sm text-slate-400">
+            Kontrol dashboard → Supabase → Python Userbot → Telegram → ESP32
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+          <div :class="['h-3 w-3 rounded-full', systemOnline ? 'bg-emerald-400 shadow-[0_0_16px_rgba(52,211,153,.8)]' : 'bg-red-400']"></div>
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Realtime</p>
+            <p class="text-sm font-semibold">{{ systemOnline ? 'Terhubung' : 'Terputus' }}</p>
+          </div>
+        </div>
+      </header>
+
+      <div v-if="loading" class="grid place-items-center rounded-3xl border border-white/10 bg-white/5 py-28">
+        <div class="text-center">
+          <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-indigo-400"></div>
+          <p class="mt-4 text-sm text-slate-400">Menghubungkan ke Smart City...</p>
+        </div>
       </div>
-      <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight drop-shadow-sm">
-        Smart Home & City <span class="text-indigo-600">IoT Hub</span>
-      </h1>
-      <p class="text-slate-500 mt-3 text-lg">Monitoring & Control Center</p>
-    </header>
 
-    <!-- Loading State -->
-    <div v-if="loading" class="flex flex-col items-center justify-center py-24">
-      <div class="relative w-20 h-20">
-        <div class="absolute inset-0 border-4 border-indigo-100 rounded-full"></div>
-        <div class="absolute inset-0 border-4 border-indigo-500 rounded-full border-t-transparent animate-spin"></div>
-        <div class="absolute inset-4 bg-indigo-100 rounded-full animate-pulse"></div>
-      </div>
-      <p class="text-lg font-medium text-slate-500 mt-6 animate-pulse">Menghubungkan ke miniatur...</p>
-    </div>
+      <main v-else class="space-y-7">
 
-    <div v-else class="max-w-6xl mx-auto space-y-10">
-      
-      <!-- Environment Status (Sensors) -->
-      <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        <!-- Cuaca -->
-        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-          <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
-          <div class="relative z-10">
-            <div class="flex justify-between items-start mb-2">
-              <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Sensor Cuaca</p>
-              <span class="text-2xl">{{ dbState.is_raining ? '🌧️' : '☀️' }}</span>
-            </div>
-            <p class="text-2xl font-black mt-2 tracking-tight" :class="dbState.is_raining ? 'text-blue-600' : 'text-slate-700'">
-              {{ dbState.is_raining ? 'Hujan Turun' : 'Cerah' }}
-            </p>
-          </div>
-        </div>
-
-        <!-- LDR -->
-        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-          <div class="absolute -right-6 -top-6 w-24 h-24 bg-amber-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
-          <div class="relative z-10">
-            <div class="flex justify-between items-start mb-2">
-              <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Pencahayaan</p>
-              <span class="text-2xl">{{ dbState.is_dark ? '🌙' : '☀️' }}</span>
-            </div>
-            <p class="text-2xl font-black mt-2 tracking-tight" :class="dbState.is_dark ? 'text-indigo-600' : 'text-amber-500'">
-              {{ dbState.is_dark ? 'Malam / Gelap' : 'Siang / Terang' }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Status -->
-        <div class="bg-slate-900 rounded-3xl p-6 shadow-lg border border-slate-800 hover:shadow-xl hover:shadow-indigo-900/20 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent"></div>
-          <div class="relative z-10 flex flex-col justify-between h-full">
-            <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Status Sistem</p>
-            <div class="flex items-center gap-3 mt-4">
-              <div class="relative flex h-5 w-5">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-5 w-5 bg-emerald-500 border-2 border-slate-900"></span>
+        <!-- Sensor summary -->
+        <section class="grid gap-4 md:grid-cols-3">
+          <div class="card">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="label">Cuaca</p>
+                <p :class="['mt-2 text-2xl font-black', dbState.is_raining ? 'text-sky-300' : 'text-amber-300']">
+                  {{ dbState.is_raining ? 'Hujan' : 'Cerah' }}
+                </p>
               </div>
-              <p class="text-2xl font-black text-white tracking-tight">Online Real-time</p>
+              <div class="icon-box">{{ dbState.is_raining ? '🌧️' : '☀️' }}</div>
             </div>
+            <p class="mt-3 text-xs text-slate-500">Sensor hujan ESP32</p>
           </div>
-        </div>
-      </section>
 
-      <!-- Control Panel (Actuators) -->
-      <section class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-200/60">
-        <div class="flex items-center justify-between mb-8">
-          <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Panel Saklar Aktuator</h2>
-          <span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Tap untuk mengontrol</span>
-        </div>
-        
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-          
-          <template v-for="(config, key) in actuatorConfigs" :key="key">
-            <!-- Jendela disembunyikan/dikomen sementara -->
-            <div 
-              v-if="key !== 'jendela'"
-              @click="toggleDevice(key)"
-              :class="[
-                'cursor-pointer relative overflow-hidden rounded-3xl p-5 border-2 transition-all duration-300 transform active:scale-95 flex flex-col',
-                dbState[key] 
-                  ? 'bg-indigo-50 border-indigo-200 shadow-[0_8px_16px_rgba(79,70,229,0.15)]' 
-                  : 'bg-slate-50 border-slate-100 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] hover:bg-slate-100'
-              ]"
-            >
-              
-              <!-- Indikator Loading saat di-klik -->
-              <div v-if="updating === key" class="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center rounded-3xl">
-                <div class="w-6 h-6 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+          <div class="card">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="label">Pencahayaan</p>
+                <p :class="['mt-2 text-2xl font-black', dbState.is_dark ? 'text-indigo-300' : 'text-amber-300']">
+                  {{ dbState.is_dark ? 'Malam' : 'Siang' }}
+                </p>
+              </div>
+              <div class="icon-box">{{ dbState.is_dark ? '🌙' : '☀️' }}</div>
+            </div>
+            <p class="mt-3 text-xs text-slate-500">Sensor LDR ESP32</p>
+          </div>
+
+          <div class="card">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="label">Perintah aktif</p>
+                <p class="mt-2 text-2xl font-black text-white">{{ pendingCount }}</p>
+              </div>
+              <div class="icon-box">📡</div>
+            </div>
+            <p class="mt-3 text-xs text-slate-500">Menunggu diproses Userbot</p>
+          </div>
+        </section>
+
+        <!-- Main controls -->
+        <section class="rounded-3xl border border-white/10 bg-white/[0.045] p-5 shadow-2xl shadow-black/20 sm:p-7">
+          <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p class="label">Control center</p>
+              <h2 class="mt-1 text-2xl font-black">Perangkat Rumah &amp; Kota</h2>
+            </div>
+            <p class="text-xs text-slate-500">Klik saklar untuk mengirim command ke grup Telegram</p>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <DeviceCard
+              v-for="(config, key) in visibleDevices"
+              :key="key"
+              :config="config"
+              :state="!!dbState[key]"
+              :busy="updating === key"
+              @toggle="toggleDevice(key)"
+            />
+          </div>
+        </section>
+
+        <!-- Activity -->
+        <section class="grid gap-4 lg:grid-cols-[1fr_320px]">
+          <div class="rounded-3xl border border-white/10 bg-white/[0.045] p-5 sm:p-7">
+            <div class="mb-5 flex items-center justify-between">
+              <div>
+                <p class="label">Activity</p>
+                <h2 class="mt-1 text-xl font-black">Sinkronisasi terakhir</h2>
+              </div>
+              <span class="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-400">
+                {{ lastSyncText }}
+              </span>
+            </div>
+
+            <div class="space-y-3">
+              <div v-if="!activity.length" class="rounded-2xl border border-dashed border-white/10 p-5 text-sm text-slate-500">
+                Belum ada aktivitas pada sesi ini.
               </div>
 
-              <!-- Header Card (Icon & Badge) -->
-              <div class="flex justify-between items-start mb-6">
-                <div class="text-3xl bg-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm"
-                     :class="dbState[key] ? 'shadow-indigo-200/50' : ''">
-                  {{ config.icon }}
+              <div
+                v-for="item in activity"
+                :key="item.id"
+                class="flex items-center gap-3 rounded-2xl border border-white/5 bg-black/10 p-3"
+              >
+                <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-indigo-500/10 text-lg">
+                  {{ item.icon }}
                 </div>
-                
-                <!-- Badge Status Kecil -->
-                <span 
-                  class="text-[10px] font-extrabold uppercase px-2 py-1 rounded-md transition-colors"
-                  :class="dbState[key] ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-500'"
-                >
-                  {{ dbState[key] ? 'ON' : 'OFF' }}
-                </span>
-              </div>
-              
-              <!-- Nama Perangkat -->
-              <h3 class="font-extrabold text-slate-800 text-lg mb-1 leading-tight">{{ config.name }}</h3>
-              <p class="text-sm font-semibold transition-colors" :class="dbState[key] ? 'text-indigo-600' : 'text-slate-400'">
-                {{ dbState[key] ? config.activeLabel : config.inactiveLabel }}
-              </p>
-
-              <!-- Animasi Saklar Lucu 3D di Bawah -->
-              <div class="mt-6">
-                <div 
-                  class="w-full h-10 rounded-xl relative p-1 transition-colors duration-300"
-                  :class="dbState[key] ? 'bg-indigo-200/50' : 'bg-slate-200/70 shadow-inner'"
-                >
-                  <div 
-                    class="w-1/2 h-full bg-white rounded-lg shadow-[0_2px_5px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all duration-300 ease-spring"
-                    :class="dbState[key] ? 'translate-x-full shadow-[0_2px_8px_rgba(79,70,229,0.3)]' : 'translate-x-0'"
-                  >
-                    <!-- Garis Grip pada tombol (seperti saklar asli) -->
-                    <div class="flex gap-[2px]">
-                      <div class="w-1 h-3 rounded-full opacity-30" :class="dbState[key] ? 'bg-indigo-600' : 'bg-slate-400'"></div>
-                      <div class="w-1 h-3 rounded-full opacity-30" :class="dbState[key] ? 'bg-indigo-600' : 'bg-slate-400'"></div>
-                    </div>
-                  </div>
+                <div class="min-w-0">
+                  <p class="truncate text-sm font-semibold">{{ item.message }}</p>
+                  <p class="text-xs text-slate-500">{{ item.time }}</p>
                 </div>
               </div>
-
             </div>
-          </template>
+          </div>
 
-        </div>
-      </section>
+          <div class="rounded-3xl border border-indigo-400/10 bg-indigo-500/5 p-5 sm:p-7">
+            <p class="label">Architecture</p>
+            <h2 class="mt-1 text-xl font-black">Alur kontrol</h2>
+            <ol class="mt-5 space-y-4 text-sm">
+              <li class="flex gap-3"><span class="step">1</span><span>Dashboard membuat command di <b>device_commands</b>.</span></li>
+              <li class="flex gap-3"><span class="step">2</span><span>Python Userbot membaca command yang pending.</span></li>
+              <li class="flex gap-3"><span class="step">3</span><span>Userbot mengirim <b>/pintu</b>, <b>/jemuran</b>, dll. ke grup.</span></li>
+              <li class="flex gap-3"><span class="step">4</span><span>ESP32 mengeksekusi dan mengirim status balik.</span></li>
+              <li class="flex gap-3"><span class="step">5</span><span>Userbot menyimpan status aktual ke Supabase.</span></li>
+              <li class="flex gap-3"><span class="step">6</span><span>Supabase Realtime langsung mengubah dashboard.</span></li>
+            </ol>
+          </div>
+        </section>
+      </main>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { supabase } from '../supabase';
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { supabase } from '../supabase'
 
-const loading = ref(true);
-const updating = ref(null);
+const loading = ref(true)
+const updating = ref(null)
+const systemOnline = ref(false)
+const lastSync = ref(new Date())
+const activity = ref([])
+const pendingCount = ref(0)
 
-// State sentral dari DB (menyesuaikan kolom tabel 'smart_city_state')
 const dbState = ref({
   pintu: false,
-  jendela: false, // Jendela tetap ada di database/state, hanya UI-nya di-hide
+  jendela: false,
   pagar: false,
   paket: false,
   jemuran: false,
@@ -166,103 +170,202 @@ const dbState = ref({
   lampu_jalan: false,
   is_raining: false,
   is_dark: false
-});
+})
 
-// Konfigurasi tampilan UI
 const actuatorConfigs = {
-  pintu: { name: 'Pintu Utama', icon: '🚪', activeLabel: 'Terbuka Terkunci', inactiveLabel: 'Tertutup Rapat' },
-  jendela: { name: 'Jendela', icon: '🪟', activeLabel: 'Terbuka', inactiveLabel: 'Tertutup' }, // Akan di-skip oleh v-if di template
-  pagar: { name: 'Pagar Depan', icon: '⛩️', activeLabel: 'Terbuka', inactiveLabel: 'Tertutup' },
-  paket: { name: 'Kotak Paket', icon: '📦', activeLabel: 'Terbuka', inactiveLabel: 'Tertutup' },
-  jemuran: { name: 'Jemuran', icon: '👕', activeLabel: 'Di Luar', inactiveLabel: 'Ditarik Ke Dalam' },
-  lampu_rumah: { name: 'Lampu Rumah', icon: '💡', activeLabel: 'Menyala Terang', inactiveLabel: 'Padam' },
-  lampu_jalan: { name: 'Lampu Jalan', icon: '🛣️', activeLabel: 'Menyala Terang', inactiveLabel: 'Padam' }
-};
+  pintu: { name: 'Pintu Utama', icon: '🚪', on: 'Terbuka', off: 'Tertutup' },
+  jendela: { name: 'Jendela', icon: '🪟', on: 'Terbuka', off: 'Tertutup' },
+  pagar: { name: 'Pagar Depan', icon: '⛩️', on: 'Terbuka', off: 'Tertutup' },
+  paket: { name: 'Kotak Paket', icon: '📦', on: 'Terbuka', off: 'Tertutup' },
+  jemuran: { name: 'Jemuran', icon: '👕', on: 'Di luar', off: 'Ditarik' },
+  lampu_rumah: { name: 'Lampu Rumah', icon: '💡', on: 'Menyala', off: 'Mati' },
+  lampu_jalan: { name: 'Lampu Jalan', icon: '🛣️', on: 'Menyala', off: 'Mati' }
+}
 
-let realtimeSubscription;
+// Sesuaikan daftar ini dengan perangkat yang benar-benar tersedia di ESP32.
+// Berdasarkan sketch yang kamu kirim: pintu, jemuran, lampu_rumah, lampu_jalan.
+const visibleDevices = computed(() => ({
+  pintu: actuatorConfigs.pintu,
+  jemuran: actuatorConfigs.jemuran,
+  lampu_rumah: actuatorConfigs.lampu_rumah,
+  lampu_jalan: actuatorConfigs.lampu_jalan
+}))
 
-// Fungsi untuk Load State awal dari Supabase
+const lastSyncText = computed(() => {
+  const diff = Math.max(0, Math.floor((Date.now() - lastSync.value.getTime()) / 1000))
+  return diff < 5 ? 'baru saja' : `${diff} detik lalu`
+})
+
+const addActivity = (message, icon = '🔄') => {
+  activity.value.unshift({
+    id: `${Date.now()}-${Math.random()}`,
+    message,
+    icon,
+    time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  })
+  activity.value = activity.value.slice(0, 8)
+}
+
 const fetchState = async () => {
-  loading.value = true;
-  try {
-    const { data, error } = await supabase
-      .from('smart_city_state')
-      .select('*')
-      .eq('id', 1)
-      .single();
-      
-    if (error) {
-      console.error('Error fetching state from Supabase:', error.message);
-    } else if (data) {
-      dbState.value = data;
-    }
-  } catch (err) {
-    console.error('System error:', err);
-  } finally {
-    loading.value = false;
-  }
-};
-
-// Fungsi Toggle mengubah DB
-const toggleDevice = async (fieldKey) => {
-  if (updating.value) return; // cegah double click
-  
-  updating.value = fieldKey;
-  const newState = !dbState.value[fieldKey];
-  
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('smart_city_state')
-    .update({ [fieldKey]: newState })
-    .eq('id', 1);
+    .select('*')
+    .eq('id', 1)
+    .single()
+
+  if (!error && data) {
+    dbState.value = { ...dbState.value, ...data }
+    lastSync.value = new Date()
+  } else if (error) {
+    console.error(error)
+  }
+}
+
+const fetchPending = async () => {
+  const { count, error } = await supabase
+    .from('device_commands')
+    .select('*', { count: 'exact', head: true })
+    .in('status', ['pending', 'sent'])
+
+  if (!error) pendingCount.value = count || 0
+}
+
+const toggleDevice = async (key) => {
+  if (updating.value) return
+
+  const desiredState = !Boolean(dbState.value[key])
+  updating.value = key
+
+  // Jangan mengubah smart_city_state langsung.
+  // Masukkan permintaan ke queue agar Python Userbot yang mengirim Telegram.
+  const { error } = await supabase
+    .from('device_commands')
+    .insert({
+      device: key,
+      desired_state: desiredState,
+      status: 'pending'
+    })
 
   if (error) {
-    console.error(`Gagal update ${fieldKey}:`, error);
-    alert('Gagal mengirim perintah ke Supabase!');
+    console.error(error)
+    alert(`Gagal membuat command: ${error.message}`)
   } else {
-    // UI update lokal secara instan supaya terasa cepat
-    dbState.value[fieldKey] = newState;
+    addActivity(
+      `${actuatorConfigs[key]?.name || key}: perintah ${desiredState ? 'ON' : 'OFF'} dikirim ke antrean`,
+      '📡'
+    )
+    await fetchPending()
   }
-  
-  updating.value = null;
-};
 
-// Fungsi Setup Realtime Supabase
+  updating.value = null
+}
+
+let stateChannel
+let commandChannel
+
 const setupRealtime = () => {
-  realtimeSubscription = supabase
-    .channel('public:smart_city_state')
+  stateChannel = supabase
+    .channel('smart-city-state-live')
     .on(
       'postgres_changes',
-      { 
-        event: 'UPDATE', 
-        schema: 'public', 
-        table: 'smart_city_state', 
-        filter: 'id=eq.1' 
-      },
+      { event: 'UPDATE', schema: 'public', table: 'smart_city_state', filter: 'id=eq.1' },
       (payload) => {
-        console.log('🔄 Data terbaru dari DB/ESP32:', payload.new);
-        dbState.value = { ...dbState.value, ...payload.new };
+        dbState.value = { ...dbState.value, ...payload.new }
+        lastSync.value = new Date()
+        systemOnline.value = true
+        addActivity('Status perangkat diperbarui dari backend/ESP32', '✅')
       }
     )
     .subscribe((status) => {
-      console.log('Realtime status:', status);
-    });
-};
+      systemOnline.value = status === 'SUBSCRIBED'
+    })
 
-onMounted(() => {
-  fetchState();
-  setupRealtime();
-});
+  commandChannel = supabase
+    .channel('device-command-live')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'device_commands' },
+      () => fetchPending()
+    )
+    .subscribe()
+}
+
+onMounted(async () => {
+  await fetchState()
+  await fetchPending()
+  setupRealtime()
+  loading.value = false
+})
 
 onUnmounted(() => {
-  if (realtimeSubscription) {
-    supabase.removeChannel(realtimeSubscription);
+  if (stateChannel) supabase.removeChannel(stateChannel)
+  if (commandChannel) supabase.removeChannel(commandChannel)
+})
+</script>
+
+<script>
+export default {
+  components: {
+    DeviceCard: {
+      props: ['config', 'state', 'busy'],
+      emits: ['toggle'],
+      template: `
+        <button
+          class="device-card text-left"
+          :class="state ? 'device-on' : 'device-off'"
+          :disabled="busy"
+          @click="$emit('toggle')"
+        >
+          <div v-if="busy" class="absolute inset-0 z-10 grid place-items-center rounded-3xl bg-slate-950/70 backdrop-blur-sm">
+            <div class="h-7 w-7 animate-spin rounded-full border-2 border-white/20 border-t-indigo-400"></div>
+          </div>
+
+          <div class="flex items-start justify-between">
+            <div class="grid h-12 w-12 place-items-center rounded-2xl bg-white/10 text-2xl">{{ config.icon }}</div>
+            <span class="rounded-full px-2.5 py-1 text-[10px] font-black tracking-widest"
+              :class="state ? 'bg-emerald-400/15 text-emerald-300' : 'bg-white/5 text-slate-500'">
+              {{ state ? 'ON' : 'OFF' }}
+            </span>
+          </div>
+
+          <div class="mt-7">
+            <h3 class="text-lg font-black">{{ config.name }}</h3>
+            <p class="mt-1 text-sm" :class="state ? 'text-emerald-300' : 'text-slate-500'">
+              {{ state ? config.on : config.off }}
+            </p>
+          </div>
+
+          <div class="mt-6 h-8 rounded-full bg-black/20 p-1">
+            <div class="h-6 w-1/2 rounded-full bg-white shadow-lg transition-transform duration-300"
+              :class="state ? 'translate-x-full' : 'translate-x-0'"></div>
+          </div>
+        </button>
+      `
+    }
   }
-});
+}
 </script>
 
 <style scoped>
-/* Tambahan CSS khusus untuk efek pantulan spring pada saklar */
-.ease-spring {
-  transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+.card {
+  @apply rounded-3xl border border-white/10 bg-white/[0.045] p-5 shadow-xl shadow-black/10;
+}
+.label {
+  @apply text-[11px] font-black uppercase tracking-[0.18em] text-slate-500;
+}
+.icon-box {
+  @apply grid h-12 w-12 place-items-center rounded-2xl bg-white/5 text-2xl;
+}
+.device-card {
+  @apply relative min-h-[220px] overflow-hidden rounded-3xl border p-5 transition duration-200 disabled:cursor-wait;
+}
+.device-on {
+  @apply border-emerald-400/20 bg-emerald-400/[0.06] hover:-translate-y-1 hover:border-emerald-400/40;
+}
+.device-off {
+  @apply border-white/10 bg-white/[0.025] hover:-translate-y-1 hover:border-white/20;
+}
+.step {
+  @apply grid h-6 w-6 shrink-0 place-items-center rounded-full bg-indigo-500/15 text-xs font-black text-indigo-300;
 }
 </style>
